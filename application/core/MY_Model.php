@@ -14,6 +14,19 @@ class MY_Model extends CI_Model
      * This model's default database table name. Set on extend.
      */
     public $_tablename;
+
+    /**
+     * Auto change table to get methods from $CI->db
+     */
+    public $_auto_requiretable = true;
+
+    /**
+     * Methods to auto set tablename
+     */
+    public $_requiretable = array(  'get', 'get_where', 'count_all_results', 'count_all', 
+                                    'insert', 'insert_batch', 'update', 'update_batch', 
+                                    'delete', 'empty_table', 'truncate'
+                                ); // possible 'from'
     
     /**
      * Initialise the model, this use the default database $this->db.
@@ -21,6 +34,35 @@ class MY_Model extends CI_Model
     public function __construct()
     {
         parent::__construct();
+    }
+
+    public function __call($method, $args)
+    {       
+
+        if (is_callable( array($this, $method) )){ // call method on this class first (for overwrite methods)
+
+            return call_user_func_array( array($this, $method), $args );
+
+        } elseif (is_callable( array($this->db, $method) )) { // call method from db
+
+            $method_args = $args;
+
+            if ($this->_auto_requiretable && in_array($method, $this->_requiretable)) {
+
+                $method_args = array($this->_tablename);
+                $method_args = array_merge($method_args, $args);
+
+            }
+
+            return call_user_func_array( array($this->db, $method), $method_args );
+
+        } else {
+
+            throw new Exception("Error on call method (".$method.") with arguments (".(string)$args.")", 1);
+            return false;
+            
+        }
+
     }
 
     /**
