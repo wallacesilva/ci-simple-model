@@ -72,23 +72,23 @@ class MY_Model extends CI_Model
      */
     public function check_exist($id)
     {
-        // verifica sem tem mensagem
-        if (empty($message_error))
-            $message_error = 'Ops! Erro ao processar dados.';
-
         // if not valid :false
         if ($id < 1) 
             return false;
 
         $item = $this->find($id);
 
-        return (bool)(isset($item->id) && $item->id == $id);
+        return (bool)(isset($item[0]->id) && $item[0]->id == $id);
 
     }
 
     public function check_exist_redirect($id, $message_error=null, $redirect_to=false)
     {   
         if (!$this->check_exist($id)) {
+
+            // verifica sem tem mensagem
+            if (empty($message_error))
+                $message_error = 'Ops! Erro ao processar dados.';
 
             $this->session->set_flashdata('msg_error', $message_error);
             redirect($redirect_to);
