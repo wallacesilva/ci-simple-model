@@ -66,6 +66,38 @@ class MY_Model extends CI_Model
     }
 
     /**
+     * Check if item/id exists on database
+     * @param integer $id Id item from table
+     * @return boolean 
+     */
+    public function check_exist($id)
+    {
+        // verifica sem tem mensagem
+        if (empty($message_error))
+            $message_error = 'Ops! Erro ao processar dados.';
+
+        // if not valid :false
+        if ($id < 1) 
+            return false;
+
+        $item = $this->find($id);
+
+        return (bool)(isset($item->id) && $item->id == $id);
+
+    }
+
+    public function check_exist_redirect($id, $message_error=null, $redirect_to=false)
+    {   
+        if (!$this->check_exist($id)) {
+
+            $this->session->set_flashdata('msg_error', $message_error);
+            redirect($redirect_to);
+
+        } 
+        
+    }
+
+    /**
      * Count all records with where
      * @param array/string $where Where to count all records
      */
