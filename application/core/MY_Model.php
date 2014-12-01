@@ -144,7 +144,7 @@ class MY_Model extends CI_Model
         if( !is_array($options) )
           $options = (array)$options;
 
-        $default = array('where' => null, 'order' => null, 'offset' => 0, 'limit' => 0);
+        $default = array('where' => null, 'order' => null, 'offset' => 0, 'limit' => 0, 'group' => null);
 
         $options = array_merge($default, $options);
 
@@ -154,6 +154,10 @@ class MY_Model extends CI_Model
         if( is_array($options['order']) )
           foreach ($options['order'] as $order_key => $order_value) 
             $this->db->order_by( $order_key, $order_value );
+
+        if( is_array($options['group']) )
+          foreach ($options['group'] as $group) 
+            $this->db->group_by( $group );
 
         if( $options['limit'] > 0 && $options['offset'] >= 0 )
           $this->db->limit($options['limit'], $options['offset']);
